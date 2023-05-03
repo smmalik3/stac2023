@@ -36,14 +36,26 @@ module.exports.readS3File = async (event) => {
     const textractParams = {
       Document: {
         Bytes: fileContent,
-      },
-      FeatureTypes: ['TABLES', 'FORMS'],
+      }
     };
+
     try {
-      // Call the analyzeDocument method and wait for the response
-      const response = await textract.analyzeDocument(textractParams).promise();
+      // Call the detectDocumentText method to start looking for text in the uplodaed file
+      const response = await textract.detectDocumentText(textractParams).promise();
       console.log(response);
-      return response;
+      
+      // Extract the text from the response
+      const text = response.Blocks.reduce((acc, block) => {
+        if (block.BlockType === 'LINE') {
+          acc += `${block.Text}\n`;
+        }
+        return acc;
+      }, '');
+
+      console.log("TEXT FROM TEXTRACT ======================>>>>>>>>>> " + text);
+
+      return text;
+      
     } catch (error) {
       console.error(error);
       throw error;
