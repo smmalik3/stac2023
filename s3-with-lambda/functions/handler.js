@@ -22,7 +22,7 @@ module.exports.readS3File = async (event) => {
     const s3Response = await s3.getObject(params).promise();
     
     // Send file to Amazon Textract
-    // Set the parameters for the analyzeDocument method
+    // Set the parameters for the detectDocumentText method
     const textractParams = {
       Document: {
         Bytes: s3Response.Body,
@@ -32,7 +32,7 @@ module.exports.readS3File = async (event) => {
     try {
       // Call the detectDocumentText method to start looking for text in the uplodaed file
       const response = await textract.detectDocumentText(textractParams).promise();
-      console.log(response);
+      // console.log(response);
       
       // Extract the text from the response
       const text = response.Blocks.reduce((acc, block) => {
@@ -44,7 +44,6 @@ module.exports.readS3File = async (event) => {
 
       console.log("TEXT FROM TEXTRACT ======================>>>>>>>>>> " + text);
 
-      // return text;
       const resume = text
       const jobDescription = "Software Engineer (3 Years Experience) - Deloitte Digital Position Title: Software Engineer (3 Years Experience) Department: Deloitte Digital Position Summary: The Software Engineer will design, develop, test and maintain enterprise applications. This individual will work closely with other software engineers and other departments to ensure that all applications are built, maintained and deployed in a manner that meets customer requirements and business objectives. Responsibilities: Design, develop, test, and maintain software applications in accordance with customer requirements and business objectives. Analyze customer requirements and business objectives to create technical design documents. Develop and ensure quality assurance of software applications with a focus on scalability, performance, and reliability. Collaborate with other software engineers to ensure that applications are built, maintained and deployed in a manner that meets customer requirements and business objectives. Troubleshoot and debug applications to identify and resolve issues. Provide technical guidance and mentorship to junior software engineers. Stay up-to-date with developments in software engineering and related technologies. Qualifications: Bachelor’s degree in computer science, software engineering, or a related field. 3+ years of professional software engineering experience. Proficient in programming languages such as Java, Python, and JavaScript. Experience in developing web services and APIs. Knowledge of Agile development practices and software engineering principles. Knowledge of database technologies such as SQL and NoSQL. Strong problem-solving, analytical, and communication skills. Ability to work both independently and collaboratively in a fast-paced, customer-focused environment."
 
@@ -54,11 +53,9 @@ module.exports.readS3File = async (event) => {
           apiKey: process.env.OPENAI_API_KEY,
       });
       const openai = new OpenAIApi(configuration);
-
-      // const userPrompt = "Can you create a job description for a Software Engineer working at Deloitte Digital with 3 years experience?"
       const userPrompt = prompt
-      const creativity = 0.7 // change this between 0.0 and 1.0, 1.0 being most creative output
-      // console.log('USER PROMPT LENGTH ---> ' + userPrompt.length)
+      const creativity = 0.0 // change this between 0.0 and 1.0, 1.0 being most creative output
+
       console.log("Prompt sent to ChatGPT: ")
       console.log(userPrompt)
       console.log("Waiting for ChatGPT's response...")
@@ -72,16 +69,10 @@ module.exports.readS3File = async (event) => {
             presence_penalty: 0,
             prompt: userPrompt,
         });
-
-        console.log("Response from Completion Run =======>>>>> " +completion.data.choices[0].text);
+        const response = completion.data.choices[0].text
+        console.log("CHATGPT RESPONSE ==========>>>>>>> " + response)
       } catch (error) {
         console.error(error);
-      }
-      if (completion.data.choices[0].text != null) {
-        response = completion.data.choices[0].text
-        console.log("CHATGPT RESPONSE ==========>>>>>>> " + response)
-      } else {
-        console.log("No response from ChatGPT")
       }
     } catch (error) {
       console.error(error);
