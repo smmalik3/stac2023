@@ -28,7 +28,14 @@ functions:
 # you can add CloudFormation resource templates here
 resources:
   Resources:
-   s3WithLambda:
-     Type: AWS::S3::Bucket
-     Properties:
-       BucketName: ${file(config.json):S3_BUCKET}
+    s3WithLambda:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${file(config.json):S3_BUCKET}
+    MyLambdaFunction:
+      Type: AWS::Lambda::Function
+      Properties:
+        Code:
+          S3Bucket: ${file(config.json):S3_BUCKET}
+        Runtime: nodejs12.x
+    
