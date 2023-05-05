@@ -27,7 +27,7 @@ functions:
 
 # you can add CloudFormation resource templates here
 resources:
- Resources:
+  Resources:
    s3WithLambda:
      Type: AWS::S3::Bucket
      Properties:
